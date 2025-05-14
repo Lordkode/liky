@@ -84,6 +84,32 @@ Each feature or fix will be developed in feature branches and merged into the re
 
 ---
 
+## 🔄 Redis Pub/Sub and Socket.io Usage
+
+To enable real-time updates and efficient event handling, this system utilizes both **Redis Pub/Sub** and **Socket.io** in the following way:
+
+### Redis Pub/Sub (Publish/Subscribe):
+
+1. **Backend Event Handling:** Redis Pub/Sub is used in the backend API to manage and propagate "like" events across distributed components of the system.
+
+   * **Publish:** When a user likes an image, the backend publishes an event to a Redis channel (e.g., `like_event`).
+   * **Subscribe:** Other components of the system (such as the real-time counter system or other services) subscribe to this channel to be notified when a new like occurs.
+
+2. **Scalable Architecture:** By using Redis Pub/Sub, we can ensure that all components of the backend (including multiple microservices if applicable) receive like events in near real-time, even if they are running on different servers or containers.
+
+### Socket.io (Real-Time Communication):
+
+1. **Mobile App Interaction:** The mobile app uses **Socket.io** to listen for real-time updates to the like counts of image posts.
+
+   * When a "like" event is triggered on the backend (via Redis Pub/Sub), the backend emits an event using Socket.io to notify all connected mobile clients about the updated like count.
+   * This enables the mobile app to update the like counters in real-time without requiring users to refresh their view.
+
+2. **WebSocket for Instant Updates:** Socket.io creates a WebSocket connection between the mobile app and the backend, ensuring that like events are pushed instantly to the app, maintaining a seamless user experience.
+
+3. **Scalability Considerations:** Both Redis Pub/Sub and Socket.io are used in combination to efficiently handle high volumes of events. Redis ensures that events are distributed reliably across backend services, and Socket.io facilitates real-time communication with the mobile app, even when handling millions of users.
+
+---
+
 ## 📚 Reference
 
 * Original Tutorial: [Designing a Scalable Likes Counting System](https://blog.algomaster.io/p/designing-a-scalable-likes-counting-system)
