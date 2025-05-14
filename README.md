@@ -70,6 +70,20 @@ Metrics observed:
 
 ---
 
+## 🔀 Branching Strategy
+
+To ensure a clean and maintainable development workflow, this repository follows a **multi-branch structure**:
+
+* **`main`** – Production-ready, stable release
+* **`prod`** – Contains the live deployment state (mirrors `main` with production configs)
+* **`staging`** – Pre-production environment for final integration testing
+* **`dev-api`** – Active development for the backend API
+* **`dev-app`** – Active development for the mobile application
+
+Each feature or fix will be developed in feature branches and merged into the respective `dev-*` branch. Pull requests will be reviewed before merging into `staging` or `main`.
+
+---
+
 ## 📚 Reference
 
 * Original Tutorial: [Designing a Scalable Likes Counting System](https://blog.algomaster.io/p/designing-a-scalable-likes-counting-system)
