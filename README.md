@@ -14,7 +14,7 @@ The goal is to learn and implement the architecture of a high-performance like s
 
 ```
 /scalable-likes-app
-├── backend/           # RESTful API 
+├── api/           # RESTful API 
 │   └── ...
 ├── mobile-app/        # Mobile app 
 │   └── ...
