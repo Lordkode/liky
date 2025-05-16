@@ -6,7 +6,9 @@ import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
 import { authRouter } from "./routes/auth.routes";
+import { postRouter } from "./routes/post.routes";
 import { Server } from "http";
+import { ErrorHandler } from "./middlewares/error.middleware";
 
 export class App {
   public app: Application;
@@ -26,8 +28,11 @@ export class App {
 
   private initializeMiddlewares(): void {
     this.app.use(express.json());
+    this.app.use(express.urlencoded({ extended: true }));
     this.app.use(cors());
-    this.app.use(helmet());
+    this.app.use(helmet({
+      crossOriginResourcePolicy: { policy: "cross-origin" }
+    }));
     this.app.use(morgan("dev"));
   }
 
@@ -63,6 +68,10 @@ export class App {
 
   private initializeRoutes(): void {
     this.app.use("/api/auth", authRouter.router);
+    this.app.use("/api/feed", postRouter.router);
+    
+    // Ajouter le middleware de gestion d'erreurs après les routes
+    this.app.use(ErrorHandler.handleError);
   }
 
   private setupRootRoute(): void {

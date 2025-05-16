@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from "../generated/prisma";
 
 export class PrismaService {
   private static instance: PrismaClient;
@@ -6,17 +6,17 @@ export class PrismaService {
   private constructor() {}
 
   public static getInstance(): PrismaClient {
-    if (!PrismaClient.instance) {
-      PrismaClient.instance = new PrismaClient();
+    if (!PrismaService.instance) {
+      PrismaService.instance = new PrismaClient();
     }
-    return PrismaClient.instance;
+    return PrismaService.instance;
   }
 
   public static async disconnect(): Promise<void> {
-    if (PrismaClient.instance) {
-      await PrismaClient.instance.disconnect();
+    if (PrismaService.instance) {
+      await PrismaService.instance.$disconnect();
     }
   }
 }
 
-export const prisma = PrismaClient.getInstance();
+export const prisma = PrismaService.getInstance();
