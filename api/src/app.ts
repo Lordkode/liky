@@ -6,11 +6,12 @@ import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
 import { authRouter } from "./routes/auth.routes";
+import { Server } from "http";
 
 export class App {
   public app: Application;
   public port: number;
-
+  public server?: Server;
   private postgresClient!: Client;
 
   constructor() {
@@ -79,6 +80,13 @@ export class App {
     this.app.listen(this.port, () => {
       console.log(`🚀 Server running at http://localhost:${this.port}`);
     });
+  }
+
+  public async close(): Promise<void> {
+    await this.postgresClient.end();
+    if (this.server) {
+      this.server.close();
+    }
   }
 }
 
