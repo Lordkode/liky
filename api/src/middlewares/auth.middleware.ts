@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { jwtService, JwtService } from "../utils/jwt.utils";
 import { PrismaClient } from "../generated/prisma";
 import { UserRepository } from "../repository/user.repository";
+import { InvalidTokenError, AuthentificationError } from "../utils/errors/auth-errors";
 
 // Extension of Express request interface for adding user
 declare global {
@@ -29,6 +30,9 @@ export class AuthMiddleware {
     try {
       // Extract token from header
       const token = jwtService.extractToken(req.headers.authorization);
+      if (!token) {
+        throw new AuthentificationError();
+      }
 
       //Verify & decode token
       const decoded = jwtService.verifyToken(token);
@@ -38,7 +42,11 @@ export class AuthMiddleware {
 
       next();
     } catch (error) {
-      next(error);
+      if (error instanceof AuthentificationError) {
+        next(error);
+      } else {
+        next(new InvalidTokenError());
+      }
     }
   };
 
