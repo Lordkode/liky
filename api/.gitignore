@@ -37,3 +37,7 @@ dump.rdb
 
 # TypeScript
 *.tsbuildinfo
+
+# Cloudinary
+cloudinary/
+uploads/

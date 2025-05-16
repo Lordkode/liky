@@ -17,6 +17,7 @@ model User {
   updatedAt DateTime @updatedAt @map("updated_at")
   likes     Like[]
   comments  Comment[]
+  images    Image[]
 
   @@map("users")
 }
@@ -25,10 +26,13 @@ model Image {
   id        String   @id @default(uuid())
   url       String   @unique
   title     String?
+  publicId  String   @unique
+  userId    String   @map("user_id")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
   likes     Like[]
   comments  Comment[]
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("images")
 }

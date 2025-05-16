@@ -57,6 +57,12 @@ interface Config {
     enableMetrics: boolean;
     metricsPort: number;
   };
+
+  cloudinary: {
+    cloudName: string;
+    apiKey: string;
+    apiSecret: string;
+  }
 }
 
 // Function to get env variable ()
@@ -125,6 +131,11 @@ export const config: Config = {
     enableMetrics: getOptionalEnvVariable("ENABLE_METRICS", "true") === "true",
     metricsPort: parseInt(getOptionalEnvVariable("METRICS_PORT", "9090"), 10),
   },
+  cloudinary: {
+    cloudName: getEnvVariable("CLOUDINARY_CLOUD_NAME"),
+    apiKey: getEnvVariable("CLOUDINARY_API_KEY"),
+    apiSecret: getEnvVariable("CLOUDINARY_API_SECRET")
+  }
 };
 
 if (config.server.nodeEnv === "production") {
