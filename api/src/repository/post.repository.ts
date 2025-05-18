@@ -20,7 +20,7 @@ export class PostRepository {
         url: postData.url,
         title: postData.title,
         userId: postData.userId,
-        publicId: postData.publicId
+        publicId: postData.publicId,
       },
     });
   }
@@ -60,7 +60,23 @@ export class PostRepository {
   // Methode for getting posts by user id
   async getPostsByUser(userId: string): Promise<Image[]> {
     return await this.prisma.image.findMany({
-      where: { userId },
+      include: {
+        user: {
+          select: { username: true },
+        },
+        likes: {
+          where: {
+            userId,
+          },
+          select: {
+            id: true,
+          },
+        },
+        comments: true,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
     });
   }
 }
