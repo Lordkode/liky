@@ -1,10 +1,18 @@
-import { Router, Request, Response, NextFunction, ErrorRequestHandler } from "express";
+import {
+  Router,
+  Request,
+  Response,
+  NextFunction,
+  ErrorRequestHandler,
+} from "express";
 import multer from "multer";
 import { PostController } from "../controller/post.controller";
 import { PrismaClient } from "../generated/prisma";
 import { authMiddleware } from "../middlewares/auth.middleware";
-import { prisma } from "../db/prisma";
-import { UnsupportedFileTypeError, InvalidPostDataError } from "../utils/errors/post-errors";
+import {
+  UnsupportedFileTypeError,
+  InvalidPostDataError,
+} from "../utils/errors/post-errors";
 
 const upload = multer({
   storage: multer.diskStorage({
@@ -20,7 +28,12 @@ const upload = multer({
     fileSize: 10 * 1024 * 1024, // 10MB
   },
   fileFilter: (req, file, cb) => {
-    const allowedTypes = ["image/jpeg", "image/png", "image/gif", "images/webp"];
+    const allowedTypes = [
+      "image/jpeg",
+      "image/png",
+      "image/gif",
+      "images/webp",
+    ];
     if (allowedTypes.includes(file.mimetype)) {
       cb(null, true);
     } else {
@@ -32,12 +45,20 @@ const upload = multer({
 // Middleware pour logger les erreurs Multer
 const handleMulterError: ErrorRequestHandler = (err, req, res, next): void => {
   if (err instanceof multer.MulterError) {
-    if (err.code === 'LIMIT_FILE_SIZE') {
-      next(new InvalidPostDataError('Le fichier est trop volumineux. Taille maximale : 10MB'));
+    if (err.code === "LIMIT_FILE_SIZE") {
+      next(
+        new InvalidPostDataError(
+          "Le fichier est trop volumineux. Taille maximale : 10MB"
+        )
+      );
       return;
     }
-    if (err.code === 'LIMIT_UNEXPECTED_FILE') {
-      next(new InvalidPostDataError(`Champ de fichier inattendu. Champ attendu: 'file'`));
+    if (err.code === "LIMIT_UNEXPECTED_FILE") {
+      next(
+        new InvalidPostDataError(
+          `Champ de fichier inattendu. Champ attendu: 'file'`
+        )
+      );
       return;
     }
     next(new InvalidPostDataError(err.message));
@@ -47,14 +68,14 @@ const handleMulterError: ErrorRequestHandler = (err, req, res, next): void => {
 };
 
 export class PostRouter {
-  private prisma: PrismaClient;
+  //private prisma: PrismaClient;
   public router: Router;
   private postController: PostController;
 
-  constructor(prisma: PrismaClient) {
-    this.prisma = prisma;
+  constructor() {
+    const prisma = new PrismaClient();
     this.router = Router();
-    this.postController = new PostController(this.prisma);
+    this.postController = new PostController(prisma);
     this.initializeRoutes();
   }
 
@@ -87,4 +108,4 @@ export class PostRouter {
   }
 }
 
-export const postRouter = new PostRouter(prisma);
+export const postRouter = new PostRouter();

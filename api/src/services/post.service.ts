@@ -68,7 +68,9 @@ export class PostService {
         const postData = {
           url: cloudinaryResult.secure_url,
           title: postDTO.title,
-          userId: postDTO.userId,
+          user: {
+            connect: { id: postDTO.userId }
+          },
           publicId: cloudinaryResult.public_id
         };
 

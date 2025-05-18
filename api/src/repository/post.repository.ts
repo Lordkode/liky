@@ -9,19 +9,9 @@ export class PostRepository {
   }
 
   // Methode pour ajouter une nouvelle image
-  async createPost(postData: {
-    url: string;
-    title?: string;
-    userId: string;
-    publicId: string;
-  }): Promise<Image> {
+  async createPost(postData: Prisma.ImageCreateInput): Promise<Image> {
     return await this.prisma.image.create({
-      data: {
-        url: postData.url,
-        title: postData.title,
-        userId: postData.userId,
-        publicId: postData.publicId,
-      },
+      data: postData,
     });
   }
 
@@ -60,17 +50,15 @@ export class PostRepository {
   // Methode for getting posts by user id
   async getPostsByUser(userId: string): Promise<Image[]> {
     return await this.prisma.image.findMany({
+      where: {
+        userId,
+      },
       include: {
         user: {
           select: { username: true },
         },
-        likes: {
-          where: {
-            userId,
-          },
-          select: {
-            id: true,
-          },
+        _count: {
+          select: { likes: true, comments: true },
         },
         comments: true,
       },
