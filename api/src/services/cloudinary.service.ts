@@ -9,7 +9,7 @@ import {
   CloudinaryUploadError,
   CloudinaryDeleteError,
   CloudinaryTransformError,
-  CloudinaryInvalidFormatError
+  CloudinaryInvalidFormatError,
 } from "../utils/errors/cloudinary-errors";
 import { AppError } from "../utils/errors/app-error";
 
@@ -35,7 +35,6 @@ cloudinary.config({
   secure: true,
 });
 export class CloudinaryService {
-  // Method
   // Method to Upload an image to cloudinary
   async uploadImage(
     path: string,
@@ -45,7 +44,9 @@ export class CloudinaryService {
       return await cloudinary.uploader.upload(path, options);
     } catch (error) {
       console.error("Error while upload to cloudinary : ", error);
-      throw new CloudinaryUploadError("Erreur lors de l'upload vers Cloudinary");
+      throw new CloudinaryUploadError(
+        "Erreur lors de l'upload vers Cloudinary"
+      );
     }
   }
 
@@ -60,15 +61,18 @@ export class CloudinaryService {
 
       // Upload vers Cloudinary
       return await cloudinary.uploader.upload(file.path, {
+        //public_id: `posts/${Date.now()}`,
         resource_type: "auto",
-        ...options
+        ...options,
       });
     } catch (error) {
       if (error instanceof AppError) {
         throw error;
       }
       console.error("Error while upload to cloudinary:", error);
-      throw new CloudinaryUploadError("Erreur lors de l'upload vers Cloudinary");
+      throw new CloudinaryUploadError(
+        "Erreur lors de l'upload vers Cloudinary"
+      );
     }
   }
 
@@ -89,7 +93,9 @@ export class CloudinaryService {
       return cloudinary.url(imageId, transformationOptions);
     } catch (error) {
       console.error("Error while generating image URL:", error);
-      throw new CloudinaryTransformError("Erreur lors de la génération de l'URL de l'image");
+      throw new CloudinaryTransformError(
+        "Erreur lors de la génération de l'URL de l'image"
+      );
     }
   }
 
@@ -99,13 +105,23 @@ export class CloudinaryService {
       await cloudinary.uploader.destroy(imageId);
     } catch (error) {
       console.error("Error while deleting image from cloudinary:", error);
-      throw new CloudinaryDeleteError("Erreur lors de la suppression de l'image");
+      throw new CloudinaryDeleteError(
+        "Erreur lors de la suppression de l'image"
+      );
     }
   }
 
   // Method to validate file type
   private validateFileType(file: Express.Multer.File) {
-    const allowedTypes = ["image/jpeg", "image/png", "image/gif", "image/webp", "image/jpg", "image/heic", "image/heif"];
+    const allowedTypes = [
+      "image/jpeg",
+      "image/png",
+      "image/gif",
+      "image/webp",
+      "image/jpg",
+      "image/heic",
+      "image/heif",
+    ];
     const fileType = file.mimetype;
     if (!allowedTypes.includes(fileType)) {
       throw new CloudinaryInvalidFormatError("Type de fichier non supporté");

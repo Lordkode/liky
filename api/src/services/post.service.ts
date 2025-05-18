@@ -128,19 +128,4 @@ export class PostService {
       throw new PostNotFoundError(postId);
     }
   }
-
-  // Method to delete post
-  
-  // async deletePost(postId: string, userId: string): Promise<void> {
-  //   const post = await this.postRepository.getPostById(postId);
-  //   if(post.userId !== userId){
-  //     throw new Error("Unauthorized !");
-  //   }
-
-  //   // Delete from cloudinary
-  //   await this.cloudinaryService.deleteImage(post.);
-
-  //   // Delete from database
-  //   await this.postRepository.deletePost(postId);
-  // }
 }
