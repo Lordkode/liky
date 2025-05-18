@@ -4,8 +4,9 @@ import { PostRepository } from "../repository/post.repository";
 import { UserRepository } from "../repository/user.repository";
 import { CloudinaryService } from "../services/cloudinary.service";
 import { PostService } from "../services/post.service";
-import { NotFoundError, AuthentificationError } from "../utils/errors/auth-errors";
+import { AuthentificationError } from "../utils/errors/auth-errors";
 import { InvalidUploadCredentialsError } from "../utils/errors/cloudinary-errors";
+import { InvalidPostDataError } from "../utils/errors/post-errors";
 
 export class PostController {
   private postService: PostService;
@@ -27,11 +28,15 @@ export class PostController {
   ): Promise<void> => {
     try {
       if (!req.file) {
-        throw new InvalidUploadCredentialsError('No file provided');
+        throw new InvalidUploadCredentialsError('Aucun fichier fourni');
       }
 
       if (!req.userId) {
-        throw new AuthentificationError('Authentication required');
+        throw new AuthentificationError();
+      }
+
+      if (!req.body.title) {
+        throw new InvalidPostDataError('Le titre est requis');
       }
 
       const PostDTO = {
@@ -43,7 +48,8 @@ export class PostController {
       const post = await this.postService.uploadImage(PostDTO);
 
       res.status(201).json({
-        status: "success",
+        status: 201,
+        code: "POST_CREATED",
         data: post,
       });
     } catch (error) {
@@ -58,9 +64,15 @@ export class PostController {
     next: NextFunction
   ): Promise<void> => {
     try {
+      if (!req.params.id) {
+        throw new InvalidPostDataError('ID du post manquant');
+      }
+
       const post = await this.postService.getPost(req.params.id);
+      
       res.status(200).json({
-        status: "success",
+        status: 200,
+        code: "POST_FOUND",
         data: post,
       });
     } catch (error) {
@@ -68,7 +80,7 @@ export class PostController {
     }
   };
 
-  // Method to get all posts
+  // Method to get one user all posts
   public getUserPosts = async (
     req: Request,
     res: Response,
@@ -76,12 +88,14 @@ export class PostController {
   ): Promise<void> => {
     try {
       if (!req.userId) {
-        throw new AuthentificationError('Authentification requise');
+        throw new AuthentificationError();
       }
 
       const posts = await this.postService.getFeed(req.userId);
+      
       res.status(200).json({
-        status: "success",
+        status: 200,
+        code: "POSTS_FOUND",
         data: posts,
       });
     } catch (error) {
