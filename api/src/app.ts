@@ -9,6 +9,7 @@ import { authRouter } from "./routes/auth.routes";
 import { postRouter } from "./routes/post.routes";
 import { Server } from "http";
 import { ErrorHandler } from "./middlewares/error.middleware";
+import { likeRouter } from "./routes/like.routes";
 
 export class App {
   public app: Application;
@@ -69,6 +70,7 @@ export class App {
   private initializeRoutes(): void {
     this.app.use("/api/auth", authRouter.router);
     this.app.use("/api/feed", postRouter.router);
+    this.app.use("/api/like", likeRouter.router);
     
     // Ajouter le middleware de gestion d'erreurs après les routes
     this.app.use(ErrorHandler.handleError);

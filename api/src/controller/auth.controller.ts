@@ -3,6 +3,7 @@ import { AuthService, LoginDTO, RegisterDTO } from "../services/auth.service";
 import { UserRepository } from "../repository/user.repository";
 import { PrismaClient } from "../generated/prisma";
 import { InvalidPostDataError } from "../utils/errors/post-errors";
+import { AuthentificationError } from "../utils/errors/auth-errors";
 
 export class AuthController {
   private authService: AuthService;
@@ -41,7 +42,8 @@ export class AuthController {
       const result = await this.authService.register(registerData);
 
       res.status(201).json({
-        status: "success",
+        status: 201,
+        code: "USER_CREATED",
         data: result,
       });
     } catch (error) {
@@ -66,7 +68,8 @@ export class AuthController {
       const result = await this.authService.login(loginData);
 
       res.status(200).json({
-        status: "success",
+        status: 200,
+        code: "LOGIN_SUCCESS",
         data: result,
       });
     } catch (error) {
@@ -77,14 +80,24 @@ export class AuthController {
   // Method to get current user
   public getcurrentUser = async (
     req: Request,
-    res: Response
+    res: Response,
+    next: NextFunction
   ): Promise<void> => {
-    res.status(200).json({
-      status: "success",
-      data: {
-        user: req.user,
-      },
-    });
+    try {
+      if (!req.user) {
+        throw new AuthentificationError();
+      }
+
+      res.status(200).json({
+        status: 200,
+        code: "USER_FOUND",
+        data: {
+          user: req.user,
+        },
+      });
+    } catch (error) {
+      next(error);
+    }
   };
 }
 
