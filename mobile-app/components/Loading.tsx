@@ -10,11 +10,9 @@ const Loading: React.FC<LoadingProps> = ({
   color = "#FFFFFF",
 }) => {
   return (
-    <>
-      <View className="items-center justify-center">
-        <ActivityIndicator size={size} color={color} />
-      </View>
-    </>
+    <View className="items-center justify-center">
+      <ActivityIndicator size={size} color={color} />
+    </View>
   );
 };
 
