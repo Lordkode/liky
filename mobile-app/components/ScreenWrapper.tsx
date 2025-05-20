@@ -6,10 +6,7 @@ interface ScreenWrapperProps {
   bg?: string;
 }
 
-const ScreenWrapper = ({
-  children,
-  bg = "#FFFFFF",
-}: PropsWithChildren<ScreenWrapperProps>) => {
+const ScreenWrapper = ({ children, bg="#FFFFFF" }: PropsWithChildren<ScreenWrapperProps>) => {
   const { top } = useSafeAreaInsets();
   const paddingTop = top > 0 ? top + 5 : 30;
   return (
