@@ -68,9 +68,9 @@ export class App {
   }
 
   private initializeRoutes(): void {
-    this.app.use("/api/v1/auth", authRouter.router);
-    this.app.use("/api/v1/feed", postRouter.router);
-    this.app.use("/api/v1/like", likeRouter.router);
+    this.app.use("/api/auth", authRouter.router);
+    this.app.use("/api/feed", postRouter.router);
+    this.app.use("/api/like", likeRouter.router);
     
     // Ajouter le middleware de gestion d'erreurs après les routes
     this.app.use(ErrorHandler.handleError);
