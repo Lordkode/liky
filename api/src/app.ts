@@ -1,7 +1,7 @@
 import { Client } from "pg";
 import express, { Application, Express, Request, Response } from "express";
 import { config } from "./config/env";
-import { redisClent } from "./db/redis";
+import { redisClient } from "./db/redis";
 import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
@@ -56,7 +56,7 @@ export class App {
 
     // Redis
     try {
-      const ping = await redisClent.ping();
+      const ping = await redisClient.ping();
       if (ping === "PONG") {
         console.log("✅ Connected to Redis");
       } else {
@@ -68,9 +68,9 @@ export class App {
   }
 
   private initializeRoutes(): void {
-    this.app.use("/api/auth", authRouter.router);
-    this.app.use("/api/feed", postRouter.router);
-    this.app.use("/api/like", likeRouter.router);
+    this.app.use("/api/v1/auth", authRouter.router);
+    this.app.use("/api/v1/feed", postRouter.router);
+    this.app.use("/api/v1/like", likeRouter.router);
     
     // Ajouter le middleware de gestion d'erreurs après les routes
     this.app.use(ErrorHandler.handleError);
@@ -78,7 +78,7 @@ export class App {
 
   private setupRootRoute(): void {
     this.app.get("/", async (req, res) => {
-      const redisPing = await redisClent.ping();
+      const redisPing = await redisClient.ping();
       res.json({
         message: "API running",
         environment: config.server.nodeEnv,

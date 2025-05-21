@@ -17,6 +17,14 @@ export class AuthRouter {
     // Login route
     this.router.post("/login", authController.login);
 
+    // Logout route
+    this.router.post(
+      "/logout",
+      authMiddleware.authenticate,
+      authMiddleware.leadUser,
+      authController.logout
+    );
+
     // route for getting current user
     this.router.get(
       "/me",

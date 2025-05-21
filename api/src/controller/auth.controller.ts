@@ -4,6 +4,8 @@ import { UserRepository } from "../repository/user.repository";
 import { PrismaClient } from "../generated/prisma";
 import { InvalidPostDataError } from "../utils/errors/post-errors";
 import { AuthentificationError } from "../utils/errors/auth-errors";
+import { jwtService } from "../utils/jwt.utils";
+import { redisClient } from "../db/redis";
 
 export class AuthController {
   private authService: AuthService;
@@ -24,7 +26,11 @@ export class AuthController {
       const registerData: RegisterDTO = req.body;
 
       // Validation des données d'entrée
-      if (!registerData.email || !registerData.password || !registerData.username) {
+      if (
+        !registerData.email ||
+        !registerData.password ||
+        !registerData.username
+      ) {
         throw new InvalidPostDataError("Tous les champs sont requis");
       }
 
@@ -36,7 +42,9 @@ export class AuthController {
 
       // Validation de la longueur du mot de passe
       if (registerData.password.length < 6) {
-        throw new InvalidPostDataError("Le mot de passe doit contenir au moins 6 caractères");
+        throw new InvalidPostDataError(
+          "Le mot de passe doit contenir au moins 6 caractères"
+        );
       }
 
       const result = await this.authService.register(registerData);
@@ -94,6 +102,31 @@ export class AuthController {
         data: {
           user: req.user,
         },
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  // Method to logout
+  public logout = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    try {
+      const token = req.headers.authorization?.split(" ")[1];
+      if (token) {
+        const decodedToken = jwtService.verifyToken(token);
+        const expireIn = decodedToken.exp - Math.floor(Date.now() / 1000);
+
+        await redisClient.set(`bl_${token}`, "true", "EX", expireIn);
+      }
+      // This is just a placeholder, as JWTs are stateless and don't require server-side invalidation
+      res.status(200).json({
+        status: 200,
+        code: "LOGOUT_SUCCESS",
+        message: "User logged out successfully",
       });
     } catch (error) {
       next(error);
