@@ -25,6 +25,14 @@ export class AuthRouter {
       authController.logout
     );
 
+    // Refresh token route
+    this.router.post(
+      "/refresh",
+      authMiddleware.authenticate,
+      authMiddleware.leadUser,
+      authController.refreshToken
+    );
+
     // route for getting current user
     this.router.get(
       "/me",

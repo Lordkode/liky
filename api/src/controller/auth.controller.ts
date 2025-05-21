@@ -3,7 +3,10 @@ import { AuthService, LoginDTO, RegisterDTO } from "../services/auth.service";
 import { UserRepository } from "../repository/user.repository";
 import { PrismaClient } from "../generated/prisma";
 import { InvalidPostDataError } from "../utils/errors/post-errors";
-import { AuthentificationError } from "../utils/errors/auth-errors";
+import {
+  AuthentificationError,
+  InvalidTokenError,
+} from "../utils/errors/auth-errors";
 import { jwtService } from "../utils/jwt.utils";
 import { redisClient } from "../db/redis";
 
@@ -56,6 +59,48 @@ export class AuthController {
       });
     } catch (error) {
       next(error);
+    }
+  };
+
+  // Method to generate new refresh token
+  public refreshToken = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    try {
+      const token = req.headers.authorization?.split(" ")[1];
+      if (!token) {
+        throw new AuthentificationError();
+      }
+      // Check blacklist on Redis
+      const isBlacklisted = await redisClient.get(`bl_${token}`);
+      if (isBlacklisted) {
+        throw new InvalidTokenError();
+      }
+      // Verify & decode token
+      const decoded = jwtService.verifyToken(token);
+      // Generate new token
+      const newToken = jwtService.generateToken({
+        userId: decoded.userId,
+      });
+      // Set new token in Redis
+      const expireIn = decoded.exp - Math.floor(Date.now() / 1000);
+      await redisClient.set(`bl_${token}`, "true", "EX", expireIn);
+      // Send new token
+      res.status(200).json({
+        status: 200,
+        code: "TOKEN_REFRESHED",
+        data: {
+          token: newToken,
+        },
+      });
+    } catch (error) {
+      if (error instanceof AuthentificationError) {
+        next(error);
+      } else {
+        next(new InvalidPostDataError("Token invalide"));
+      }
     }
   };
 

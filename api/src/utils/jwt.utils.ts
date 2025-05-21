@@ -21,6 +21,12 @@ export class JwtService {
     });
   }
 
+  public generateRefreshToken(payload: Record<string, any>): string {
+    return jwt.sign(payload, this.jwtSecret as jwt.Secret, {
+      expiresIn: "7d",
+    });
+  }
+
   public verifyToken(token: string): any {
     try {
       return jwt.verify(token, this.jwtSecret);
