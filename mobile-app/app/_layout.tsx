@@ -14,6 +14,7 @@ function LayoutWrapper() {
       <Stack.Screen name="login" />
       <Stack.Screen name="register" />
       <Stack.Screen name="welcome" />
+      <Stack.Screen name="(main)" />
     </Stack>
   );
 }
