@@ -6,6 +6,7 @@ import {
 } from "../utils/errors/auth-errors";
 import { User } from "../generated/prisma";
 import { PasswordService } from "../utils/password.utils";
+import { redisClient } from "../db/redis";
 
 export interface RegisterDTO {
   email: string;
@@ -21,14 +22,13 @@ export interface LoginDTO {
 export interface AuthResponseDTO {
   user: Omit<User, "password">;
   token: string;
+  refreshToken?: string;
 }
 
 export class AuthService {
   private userRepository: UserRepository;
 
-  constructor(
-    userRepository: UserRepository,
-  ) {
+  constructor(userRepository: UserRepository) {
     this.userRepository = userRepository;
   }
 
@@ -53,6 +53,16 @@ export class AuthService {
 
     // Generate token
     const token = jwtService.generateToken({ userId: newUser.id });
+    const refreshToken = jwtService.generateRefreshToken({
+      userId: newUser.id,
+    });
+    // Store refresh token in Redis
+    await redisClient.set(
+      `refreshToken_${newUser.id}`,
+      refreshToken,
+      "EX",
+      60 * 60 * 24 * 30 // 30 days
+    );
 
     // Delete password from response
     const { password, ...userWithoutPassword } = newUser;
@@ -60,6 +70,7 @@ export class AuthService {
     return {
       user: userWithoutPassword,
       token,
+      refreshToken,
     };
   }
 
@@ -82,6 +93,16 @@ export class AuthService {
 
     // Generate token
     const token = jwtService.generateToken({ userId: user.id });
+    const refreshToken = jwtService.generateRefreshToken({
+      userId: user.id,
+    });
+    // Store refresh token in Redis
+    await redisClient.set(
+      `refreshToken_${user.id}`,
+      refreshToken,
+      "EX",
+      60 * 60 * 24 * 30 // 30 days
+    );
 
     // Delete password ffrom response
     const { password, ...userWithoutPassword } = user;
@@ -89,6 +110,7 @@ export class AuthService {
     return {
       user: userWithoutPassword,
       token,
+      refreshToken,
     };
   }
 }

@@ -17,4 +17,4 @@ class RedisClient {
   }
 }
 
-export const redisClent = RedisClient.getInstance();
+export const redisClient = RedisClient.getInstance();
