@@ -2,7 +2,6 @@ import jwt, { Secret, JwtPayload } from "jsonwebtoken";
 import config from "../config/env";
 import {
   TokenExpiredError as JwtTokenExpiredError,
-  JsonWebTokenError,
 } from "jsonwebtoken";
 import { InvalidTokenError, TokenExpiredError } from "./errors/auth-errors";
 
