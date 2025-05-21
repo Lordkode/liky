@@ -2,7 +2,11 @@ import { Request, Response, NextFunction } from "express";
 import { jwtService, JwtService } from "../utils/jwt.utils";
 import { PrismaClient } from "../generated/prisma";
 import { UserRepository } from "../repository/user.repository";
-import { InvalidTokenError, AuthentificationError } from "../utils/errors/auth-errors";
+import {
+  InvalidTokenError,
+  AuthentificationError,
+} from "../utils/errors/auth-errors";
+import { redisClient } from "../db/redis";
 
 // Extension of Express request interface for adding user
 declare global {
@@ -32,6 +36,12 @@ export class AuthMiddleware {
       const token = jwtService.extractToken(req.headers.authorization);
       if (!token) {
         throw new AuthentificationError();
+      }
+
+      // Check blacklist on Redis
+      const isBlacklisted = await redisClient.get(`bl_${token}`);
+      if (isBlacklisted) {
+        throw new InvalidTokenError();
       }
 
       //Verify & decode token

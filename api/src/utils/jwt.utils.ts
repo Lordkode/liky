@@ -7,17 +7,23 @@ import { InvalidTokenError, TokenExpiredError } from "./errors/auth-errors";
 
 export class JwtService {
   private readonly jwtSecret: string;
-  private readonly tokenExpiration: string | number;
+  private readonly tokenExpiration: string;
 
   constructor() {
     this.jwtSecret = config.security.jwtSecret;
-    this.tokenExpiration =
-      parseInt(config.security.jwtExpiration, 10) ||
-      config.security.jwtExpiration;
+    this.tokenExpiration = config.security.jwtExpiration;
   }
 
   public generateToken(payload: Record<string, any>): string {
-    return jwt.sign(payload, this.jwtSecret as jwt.Secret);
+    return jwt.sign(payload, this.jwtSecret as jwt.Secret, {
+      expiresIn: this.tokenExpiration as jwt.SignOptions["expiresIn"],
+    });
+  }
+
+  public generateRefreshToken(payload: Record<string, any>): string {
+    return jwt.sign(payload, this.jwtSecret as jwt.Secret, {
+      expiresIn: "7d",
+    });
   }
 
   public verifyToken(token: string): any {
