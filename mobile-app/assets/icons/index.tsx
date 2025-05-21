@@ -53,15 +53,15 @@ interface IconProps {
   [key: string]: any;
 }
 
-const Icon = ({ name, ...props }: { name: keyof typeof icons } & IconProps) => {
+const Icon = ({ name, color = "#7C7C7C", ...props }: { name: keyof typeof icons } & IconProps) => {
   const IconComponent = icons[name];
   return (
     <IconComponent
       width={props.size || 24}
       height={props.size || 24}
       strokeWidth={props.strokeWidth || 1.9}
-      color="#7C7C7C"
-      currentColor="#7C7C7C"
+      color={color}
+      currentColor={color}
       fill="none"
       {...props}
     />
