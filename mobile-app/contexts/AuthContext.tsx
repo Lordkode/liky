@@ -18,7 +18,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         const isAuthenticated = await AuthService.isAuthenticated();
         if (isAuthenticated) {
           const userData = await AuthService.getCurrentUser();
-          setUser(userData);
+          setUser(userData.data.user);
         }
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (error) {
