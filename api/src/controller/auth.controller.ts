@@ -166,6 +166,7 @@ export class AuthController {
         const expireIn = decodedToken.exp - Math.floor(Date.now() / 1000);
 
         await redisClient.set(`bl_${token}`, "true", "EX", expireIn);
+        await redisClient.del(`refreshToken_${decodedToken.userId}`);
       }
       // This is just a placeholder, as JWTs are stateless and don't require server-side invalidation
       res.status(200).json({

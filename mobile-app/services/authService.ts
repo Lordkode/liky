@@ -14,17 +14,20 @@ class AuthService {
 
       const response = await apiClient.post("auth/login", credentials);
 
-      console.log("Raw login response:", response);
+      // console.log("Raw login response:", response);
 
       // Vérifier si la réponse est valide et contient les données attendues
       if (!response.data?.data?.token) {
         throw new Error("Invalid response format");
       }
 
-      const { token } = response.data.data;
+      const { token, refreshToken } = response.data.data;
 
       // Store tokens securely
       await setItemAsync(Constants.AUTH_TOKEN_NAME, token);
+      if (refreshToken) {
+        await setItemAsync(Constants.REFRESH_TOKEN_NAME, refreshToken);
+      }
 
       return response.data;
     } catch (error: any) {
