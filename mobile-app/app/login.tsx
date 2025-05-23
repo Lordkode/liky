@@ -24,7 +24,6 @@ const LoginScreen = () => {
     setLoading(true);
     try {
       const response = await AuthService.login({ email, password });
-      console.log("Login successful, user data:", response.data.user);
       setUser(response.data.user);
       router.replace("/(main)/home");
     } catch (error: any) {
